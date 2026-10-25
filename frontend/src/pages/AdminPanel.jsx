@@ -47,8 +47,13 @@ const AdminPanel = () => {
       setViolationFeed(dashRes.data.data.violationFeed);
       setExams(examsRes.data.data.exams);
       setIsLoading(false);
-    } catch {
-      setError("Telemetry synchronization failed. Access denied or server unreachable.");
+    } catch (requestError) {
+      const status = requestError.response?.status;
+      const apiMessage = requestError.response?.data?.message;
+      const detail = status
+        ? `Request failed with HTTP ${status}${apiMessage ? `: ${apiMessage}` : '.'}`
+        : 'The API could not be reached. Check the backend service and VITE_API_URL.';
+      setError(`Telemetry synchronization failed. ${detail}`);
       setIsLoading(false);
     }
   };
