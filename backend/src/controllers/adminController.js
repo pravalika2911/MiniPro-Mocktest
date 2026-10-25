@@ -79,20 +79,21 @@ exports.getDashboardStats = asyncHandler(async (req, res) => {
   let totalViolations = 0;
   const violationFeed = [];
 
-  sessionsWithViolations.forEach(session => {
-    totalViolations += session.violationCount;
-    
-    session.proctoringLogs.forEach(log => {
-      violationFeed.push({
-        studentName: session.userId.name,
-        studentEmail: session.userId.email,
-        examName: session.examId.title,
-        violationType: log.violationType,
-        timestamp: log.timestamp,
-        sessionId: session._id
-      });
+sessionsWithViolations.forEach((session) => {
+  totalViolations += session.violationCount || 0;
+
+  (session.proctoringLogs || []).forEach((log) => {
+    violationFeed.push({
+      studentName: session.userId?.name || 'Unknown Student',
+      studentEmail: session.userId?.email || 'N/A',
+      examName: session.examId?.title || 'Unknown Exam',
+      violationType: log.violationType,
+      timestamp: log.timestamp,
+      sessionId: session._id
     });
   });
+});
+
   
   // Sort feed by most recent
   violationFeed.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
